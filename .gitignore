@@ -1,0 +1,74 @@
+# Packages           #
+######################
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Logs               #
+######################
+*.log
+*.retry
+logs
+
+# OS generated files #
+######################
+Icon?
+ehthumbs.db
+Thumbs.db
+*~
+*.lock
+.DS_Store
+*.swp
+*.out
+*.bak
+._*
+.Trashes
+.Spotlight-V100
+.AppleDouble
+
+# Python specific    #
+######################
+*.py[cod]
+*.egg
+*.egg-info
+__pycache__/
+.cache/
+.pytest_cache
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.sqlite
+
+# Molecule specific  #
+######################
+.molecule/
+
+# IDE specific       #
+######################
+tags
+.vscode/
+.project
+.projectile
+.pydevproject
+/.git
+/.settings
+.idea/
+libspecs/
+red.xml
+log.html
+output.xml
+report.html
+
+# Documentation      #
+######################
+doc_src/Output
+doc_src/Analyzer
+doc_src/Project/Usersoc_src/Project/Users
