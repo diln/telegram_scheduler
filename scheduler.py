@@ -1,5 +1,8 @@
 import datetime
+import logging.config
+import os
 import re
+
 import apiclient.discovery
 import httplib2
 import prettytable as pt
@@ -7,10 +10,7 @@ import telebot
 from PIL import Image, ImageDraw, ImageFont
 from oauth2client.service_account import ServiceAccountCredentials
 from telebot import types
-from telebot.types import ReplyKeyboardRemove, CallbackQuery
 from telegram_bot_calendar import DetailedTelegramCalendar
-import os
-import logging.config
 
 # Настройки бота
 bot_token = os.environ.get('bot_token')
