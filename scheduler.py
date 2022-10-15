@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from oauth2client.service_account import ServiceAccountCredentials
 from telebot import types
 from telegram_bot_calendar import DetailedTelegramCalendar
+import traceback
 
 # Настройки бота
 bot_token = os.environ.get('bot_token')
@@ -32,8 +33,11 @@ def get_table():
         values = resp['values']
         max_len_row = max([len(r) for r in values])
         for r in values:
-            if len(r) < max_len_row:
-                r = r.append('')
+            current_len = len(r)
+            if current_len < max_len_row:
+                while current_len < max_len_row:
+                    r.append('')
+                    current_len += 1
         table = pt.PrettyTable(h_values)
 
         for line in values:
@@ -42,6 +46,7 @@ def get_table():
         logging.info(f'Полученная таблица:\n{table}')
         return table
     except Exception as e:
+        logging.error(f'Error in get_table:', traceback.format_exc())
         return False
 
 
