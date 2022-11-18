@@ -52,6 +52,7 @@ def get_table():
 
 def add_row_to_table(day_1, day_2, name):
     logging.info('Добавление строки в таблицу..')
+    logging.debug(f'Переданы аргументы: {locals()}')
     cell_occupied = False
     msg = ''
     try:
@@ -63,6 +64,7 @@ def add_row_to_table(day_1, day_2, name):
                 cell_occupied = i
 
         if cell_occupied:
+            logging.info(f'Найдена существующая строка: {values[i]}')
             values[i] = [f'{day_1} - {day_2}', values[i][1], name]
             resp_upd = service.spreadsheets().values().update(spreadsheetId=sheet_id,
                                                               range="Лист1!A1",
@@ -80,7 +82,7 @@ def add_row_to_table(day_1, day_2, name):
         return True, msg
     except Exception as e:
         msg = 'Ошибка обновления данных в таблице!'
-        logging.error(f'{msg} {e}')
+        logging.error(f'{msg} {e}', traceback.format_exc())
         return False, msg
 
 
@@ -120,7 +122,8 @@ class MyStyleCalendar(DetailedTelegramCalendar):
 
 @bot.message_handler(commands=['get_table'])
 def send_table_photo(message):
-    logging.info('Нажата кнопка `get_table`')
+    logging.info(
+        f'Пользователем `{message.from_user.first_name}` (@{message.from_user.username}) нажата кнопка `get_table`')
     markup = types.InlineKeyboardMarkup()
     button = types.InlineKeyboardButton('Добавить дежурство', callback_data='add')
     markup.add(button)
@@ -138,7 +141,8 @@ def send_table_photo(message):
 
 @bot.callback_query_handler(lambda c: c.data == "add")
 def process_callback_1(c):
-    logging.info('Нажата кнопка `Добавить дежурство`')
+    logging.info(
+        f'Пользователем `{c.from_user.first_name}` (@{c.from_user.username}) нажата кнопка `Добавить дежурство`')
     calendar, step = MyStyleCalendar(min_date=datetime.date.today(),
                                      max_date=datetime.date.today()+datetime.timedelta(weeks=26),
                                      locale='ru').build()
@@ -168,7 +172,7 @@ def cal(c):
             name_user = f'{c.from_user.first_name} {c.from_user.last_name}'
         res, msg = add_row_to_table(day_1, day_2, name_user)
         if res:
-            logging.info(f'Пользовтаель `{name_user}` выбрал дежурство: {msg_str}')
+            logging.info(f'Пользователь `{name_user}` (@{c.from_user.username}) выбрал дежурство: {msg_str}')
             bot.edit_message_text(f'{name_user}, вы выбрали дежурство *{msg_str}*',
                                   c.message.chat.id, c.message.message_id, parse_mode='Markdown')
         else:
@@ -177,4 +181,5 @@ def cal(c):
 
 if __name__ == '__main__':
     logging.config.fileConfig('logging.ini')
+    logging.info('bot started')
     bot.polling(none_stop=True)
