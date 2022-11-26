@@ -50,7 +50,7 @@ def get_table():
         return False
 
 
-def add_row_to_table(day_1, day_2, name):
+def add_row_to_table(day1, day2, name):
     logging.info('Добавление строки в таблицу..')
     logging.debug(f'Переданы аргументы: {locals()}')
     cell_occupied = False
@@ -60,19 +60,18 @@ def add_row_to_table(day_1, day_2, name):
         values = resp['values']
 
         for i in range(len(values)):
-            if values[i] and (re.search(day_1, values[i][0]) or re.search(day_2, values[i][0])):
+            if values[i] and (re.search(day1, values[i][0]) or re.search(day2, values[i][0])):
                 cell_occupied = i
-
         if cell_occupied:
             logging.info(f'Найдена существующая строка: {values[i]}')
-            values[i] = [f'{day_1} - {day_2}', values[i][1], name]
+            values[i] = [f'{day1} - {day2}', values[cell_occupied][1] if len(values[cell_occupied]) >= 2 else '', name]
             resp_upd = service.spreadsheets().values().update(spreadsheetId=sheet_id,
                                                               range="Лист1!A1",
                                                               valueInputOption="RAW",
                                                               body={'values': values}).execute()
             msg = f'Обновлена существующая строка:\n{values[i]}'
         else:
-            new_row = [[f'{day_1} - {day_2}', '', name]]
+            new_row = [[f'{day1} - {day2}', '', name]]
             resp_upd = service.spreadsheets().values().append(spreadsheetId=sheet_id,
                                                               range="Лист1!A1:C1",
                                                               valueInputOption="RAW",
@@ -164,13 +163,13 @@ def cal(c):
             cur_str = 'день'
         bot.edit_message_text(f"Выберите {cur_str}:", c.message.chat.id, c.message.message_id, reply_markup=key)
     elif result:
-        day_1 = (result - datetime.timedelta(days=1)).strftime("%d.%m")
-        day_2 = result.strftime("%d.%m")
-        msg_str = f'{day_1} - {day_2}'
+        day1 = (result - datetime.timedelta(days=1)).strftime("%d.%m")
+        day2 = result.strftime("%d.%m")
+        msg_str = f'{day1} - {day2}'
         name_user = c.from_user.first_name
         if c.from_user.last_name:
             name_user = f'{c.from_user.first_name} {c.from_user.last_name}'
-        res, msg = add_row_to_table(day_1, day_2, name_user)
+        res, msg = add_row_to_table(day1, day2, name_user)
         if res:
             logging.info(f'Пользователь `{name_user}` (@{c.from_user.username}) выбрал дежурство: {msg_str}')
             bot.edit_message_text(f'{name_user}, вы выбрали дежурство *{msg_str}*',
