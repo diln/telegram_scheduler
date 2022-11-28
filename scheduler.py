@@ -63,20 +63,24 @@ def add_row_to_table(day1, day2, name):
             if values[i] and (re.search(day1, values[i][0]) or re.search(day2, values[i][0])):
                 cell_occupied = i
         if cell_occupied:
-            logging.info(f'Найдена существующая строка: {values[i]}')
-            values[i] = [f'{day1} - {day2}', values[cell_occupied][1] if len(values[cell_occupied]) >= 2 else '', name]
+            logging.info(f'Найдена существующая строка: {values[cell_occupied]}')
+            values[cell_occupied] = [
+                f'{day1} - {day2}',
+                values[cell_occupied][1] if len(values[cell_occupied]) >= 2 else '',
+                name
+            ]
             resp_upd = service.spreadsheets().values().update(spreadsheetId=sheet_id,
                                                               range="Лист1!A1",
                                                               valueInputOption="RAW",
                                                               body={'values': values}).execute()
-            msg = f'Обновлена существующая строка:\n{values[i]}'
+            msg = f'Обновленная строка:\n{values[cell_occupied]}'
         else:
             new_row = [[f'{day1} - {day2}', '', name]]
             resp_upd = service.spreadsheets().values().append(spreadsheetId=sheet_id,
                                                               range="Лист1!A1:C1",
                                                               valueInputOption="RAW",
                                                               body={'values': new_row}).execute()
-            msg = f'Добавлена строка:\n{new_row}'
+            msg = f'Добавлена новая строка:\n{new_row}'
         logging.info(msg)
         return True, msg
     except Exception as e:
