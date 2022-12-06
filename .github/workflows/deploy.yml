@@ -33,6 +33,6 @@ jobs:
           docker rm $CONTAINER_NAME
           docker run -d --restart unless-stopped --name $CONTAINER_NAME -e bot_token="$TELEGRAM_BOT_TOKEN" -e sheet_id="$GOOGLE_SHEET_ID" telegram_scheduler
           sleep 3
-          docker logs $CONTAINER_NAME
+          docker logs $CONTAINER_NAME 2>&1 | grep 'INFO - bot starteeeed'
           
         
