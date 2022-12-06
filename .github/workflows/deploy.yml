@@ -7,21 +7,31 @@ on:
     branches: [ "master" ]
 
 jobs:
-  test:
+  Deploy_scheduler:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Test ssh
       uses: appleboy/ssh-action@master
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        CONTAINER_NAME: telegram_scheduler_bot
       with:
         host: ${{ secrets.DEPLOY_SERVER_HOST }}
         username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
         key: ${{ secrets.DEPLOY_SERVER_KEY }}
         port: ${{ secrets.DEPLOY_SERVER_PORT }}
+        script_stop: true
+        envs: TELEGRAM_BOT_TOKEN,GOOGLE_SHEET_ID,CONTAINER_NAME
         script: |
-          whoami
-          pwd
-          ls -la
-        
+          cd /opt/telegram_scheduler
+          git pull
+          docker build . -t telegram_scheduler
+          docker stop $CONTAINER_NAME
+          docker rm $CONTAINER_NAME
+          docker run -d --restart unless-stopped --name $CONTAINER_NAME -e bot_token="$TELEGRAM_BOT_TOKEN" -e sheet_id="$GOOGLE_SHEET_ID" telegram_scheduler
+          docker logs $CONTAINER_NAME
+          
         
