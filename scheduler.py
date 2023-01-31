@@ -28,7 +28,8 @@ service = apiclient.discovery.build('sheets', 'v4', http=creds_service)
 def get_table():
     try:
         logging.info('Получаем таблицу из Google sheets..')
-        resp = service.spreadsheets().values().get(spreadsheetId=sheet_id, range="Лист1!A1:AA1001").execute()
+        current_year = datetime.datetime.now().year
+        resp = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"{current_year}!A1:AA1001").execute()
         h_values = resp['values'].pop(0)
         values = resp['values']
         max_len_row = max([len(r) for r in values])
