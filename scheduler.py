@@ -71,7 +71,7 @@ def add_row_to_table(day1, day2, name):
                 name
             ]
             resp_upd = service.spreadsheets().values().update(spreadsheetId=sheet_id,
-                                                              range=f"{current_year}1!A1",
+                                                              range=f"{current_year}!A1",
                                                               valueInputOption="RAW",
                                                               body={'values': values}).execute()
             msg = f'Обновленная строка:\n{values[cell_occupied]}'
