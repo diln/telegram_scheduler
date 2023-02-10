@@ -23,12 +23,12 @@ scopes = ['https://www.googleapis.com/auth/spreadsheets']
 sheet_id = os.environ.get('sheet_id')
 creds_service = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scopes).authorize(httplib2.Http())
 service = apiclient.discovery.build('sheets', 'v4', http=creds_service)
+current_year = datetime.datetime.now().year
 
 
 def get_table():
     try:
         logging.info('Получаем таблицу из Google sheets..')
-        current_year = datetime.datetime.now().year
         resp = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"{current_year}!A1:AA1001").execute()
         h_values = resp['values'].pop(0)
         values = resp['values']
@@ -57,7 +57,7 @@ def add_row_to_table(day1, day2, name):
     cell_occupied = False
     msg = ''
     try:
-        resp = service.spreadsheets().values().get(spreadsheetId=sheet_id, range="Лист1!A1:AA1001").execute()
+        resp = service.spreadsheets().values().get(spreadsheetId=sheet_id, range=f"{current_year}!A1:AA1001").execute()
         values = resp['values']
 
         for i in range(len(values)):
@@ -71,14 +71,14 @@ def add_row_to_table(day1, day2, name):
                 name
             ]
             resp_upd = service.spreadsheets().values().update(spreadsheetId=sheet_id,
-                                                              range="Лист1!A1",
+                                                              range=f"{current_year}1!A1",
                                                               valueInputOption="RAW",
                                                               body={'values': values}).execute()
             msg = f'Обновленная строка:\n{values[cell_occupied]}'
         else:
             new_row = [[f'{day1} - {day2}', '', name]]
             resp_upd = service.spreadsheets().values().append(spreadsheetId=sheet_id,
-                                                              range="Лист1!A1:C1",
+                                                              range=f"{current_year}!A1:C1",
                                                               valueInputOption="RAW",
                                                               body={'values': new_row}).execute()
             msg = f'Добавлена новая строка:\n{new_row}'
